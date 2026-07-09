@@ -279,7 +279,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               pw.TableHelper.fromTextArray(
                 headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                 headers: ['Date', 'Type', 'Value', 'Status'],
-                rows: bloodSugarRecords.take(20).map((r) {
+                data: bloodSugarRecords.take(20).map((r) {
                   final status = r.value > r.type.normalRangeHigh
                       ? 'High'
                       : r.value < r.type.normalRangeLow
@@ -302,7 +302,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               pw.TableHelper.fromTextArray(
                 headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                 headers: ['Date', 'Risk Level', 'Confidence'],
-                rows: predictions.take(10).map((p) {
+                data: predictions.take(10).map((p) {
                   return [
                     DateFormat('MMM dd, yyyy').format(p.createdAt),
                     p.riskLevel.displayName,
@@ -319,7 +319,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
               pw.TableHelper.fromTextArray(
                 headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                 headers: ['Medicine', 'Dosage', 'Time', 'Status'],
-                rows: medications.map((m) {
+                data: medications.map((m) {
                   return [
                     m.medicineName,
                     m.dosage,
