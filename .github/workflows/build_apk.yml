@@ -24,32 +24,8 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Backup custom files
-        run: |
-          mkdir -p /tmp/backup
-          cp pubspec.yaml /tmp/backup/
-          cp -r lib /tmp/backup/
-          cp -r assets /tmp/backup/ 2>/dev/null || true
-          cp analysis_options.yaml /tmp/backup/ 2>/dev/null || true
-
-      - name: Create fresh Flutter project
-        run: |
-          rm -rf android/ test/
-          flutter create --project-name sugar_ai --org com.sugarai --platforms android .
-          flutter pub get
-
-      - name: Restore custom code
-        run: |
-          cp /tmp/backup/pubspec.yaml pubspec.yaml
-          rm -rf lib/ assets/
-          cp -r /tmp/backup/lib .
-          cp -r /tmp/backup/assets . 2>/dev/null || true
-          flutter pub get
-
-      - name: Fix minSdkVersion for tflite_flutter
-        run: |
-          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 26/' android/app/build.gradle
-          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 26/' android/app/build.gradle.kts 2>/dev/null || true
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Build APK
         run: flutter build apk --release
