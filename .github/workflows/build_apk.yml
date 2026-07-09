@@ -46,6 +46,11 @@ jobs:
           cp -r /tmp/backup/assets . 2>/dev/null || true
           flutter pub get
 
+      - name: Fix minSdkVersion for tflite_flutter
+        run: |
+          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 26/' android/app/build.gradle
+          sed -i 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 26/' android/app/build.gradle.kts 2>/dev/null || true
+
       - name: Build APK
         run: flutter build apk --release
 
