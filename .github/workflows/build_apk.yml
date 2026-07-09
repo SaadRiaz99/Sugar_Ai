@@ -24,15 +24,27 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Generate missing platform files
+      - name: Backup custom files
         run: |
-          flutter create --project-name sugar_ai --org com.sugarai --platforms android /tmp/sugar_ai_template
-          cp -r /tmp/sugar_ai_template/android/* android/
-          cp -r /tmp/sugar_ai_template/test/* test/ 2>/dev/null || true
-          cp /tmp/sugar_ai_template/analysis_options.yaml analysis_options.yaml 2>/dev/null || true
+          mkdir -p /tmp/backup
+          cp pubspec.yaml /tmp/backup/
+          cp -r lib /tmp/backup/
+          cp -r assets /tmp/backup/ 2>/dev/null || true
+          cp analysis_options.yaml /tmp/backup/ 2>/dev/null || true
 
-      - name: Install dependencies
-        run: flutter pub get
+      - name: Create fresh Flutter project
+        run: |
+          rm -rf android/ test/
+          flutter create --project-name sugar_ai --org com.sugarai --platforms android .
+          flutter pub get
+
+      - name: Restore custom code
+        run: |
+          cp /tmp/backup/pubspec.yaml pubspec.yaml
+          rm -rf lib/ assets/
+          cp -r /tmp/backup/lib .
+          cp -r /tmp/backup/assets . 2>/dev/null || true
+          flutter pub get
 
       - name: Build APK
         run: flutter build apk --release
