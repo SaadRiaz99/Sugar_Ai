@@ -24,10 +24,15 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Generate platform files
+      - name: Generate missing platform files
         run: |
-          flutter create --platforms android --org com.sugarai .
-          flutter pub get
+          flutter create --project-name sugar_ai --org com.sugarai --platforms android /tmp/sugar_ai_template
+          cp -r /tmp/sugar_ai_template/android/* android/
+          cp -r /tmp/sugar_ai_template/test/* test/ 2>/dev/null || true
+          cp /tmp/sugar_ai_template/analysis_options.yaml analysis_options.yaml 2>/dev/null || true
+
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Build APK
         run: flutter build apk --release
