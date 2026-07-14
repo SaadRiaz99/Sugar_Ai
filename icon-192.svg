@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d2a3a"/>
+      <stop offset="100%" style="stop-color:#0a1628"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#b91c1c"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="34" fill="url(#bg)"/>
+  <path d="M96 30 C96 30 60 75 60 100 C60 120 76 136 96 136 C116 136 132 120 132 100 C132 75 96 30 96 30Z" fill="url(#drop)"/>
+  <ellipse cx="82" cy="90" rx="6" ry="12" fill="rgba(255,255,255,0.25)" transform="rotate(-15 82 90)"/>
+  <text x="96" y="165" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="20" fill="#e8f4f8">Sugar Tracker</text>
+</svg>
