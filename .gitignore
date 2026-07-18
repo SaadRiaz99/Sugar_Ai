@@ -1,0 +1,21 @@
+# Build artifacts
+diabetes-tracker/*.apk
+diabetes-tracker/apk/app/build/
+diabetes-tracker/apk/build/
+
+# Gradle cache directories
+diabetes-tracker/apk/.gradle/
+
+# Binary/cached files
+*.bin
+*.lock
+
+# Local properties (machine-specific)
+diabetes-tracker/apk/local.properties
+
+# Gradle distribution zip
+diabetes-tracker/apk/gradle-8.5-bin.zip
+
+# OS files
+.DS_Store
+Thumbs.db
