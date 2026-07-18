@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Background -->
+    <path
+        android:fillColor="#f0f4f8"
+        android:pathData="M0,0h48v48h-48z"/>
+    <!-- Blood drop -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M24,6 C24,6 14,20 14,28 C14,34 18.5,38 24,38 C29.5,38 34,34 34,28 C34,20 24,6 24,6Z"/>
+    <!-- Shine -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M20,24 Q19,20 21,22 Q20,26 20,24Z"
+        android:fillAlpha="0.4"/>
+</vector>
