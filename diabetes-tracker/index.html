@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#f0f4f8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Sugar Tracker - Monitor your blood sugar levels">
+  <title>Sugar Tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🩸</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- SPLASH SCREEN -->
+  <div id="splash" class="splash">
+    <div class="splash-content">
+      <div class="splash-icon">🩸</div>
+      <h1 class="splash-title">Sugar Tracker</h1>
+      <p class="splash-subtitle">Blood Sugar Monitoring App</p>
+      <div class="splash-loader">
+        <div class="loader-bar"></div>
+      </div>
+      <div class="splash-brand">
+        <p class="brand-line">Made by <strong>Saad Bin Riaz</strong></p>
+        <p class="brand-line powered">Powered by <strong>Aiee</strong></p>
+        <p class="brand-line contact">📞 0314-1088892</p>
+        <p class="brand-line contact-sub">For Software Development Contact Us</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app" class="app hidden">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-top">
+        <div>
+          <h1 class="header-title">Sugar Tracker</h1>
+          <p class="header-sub" id="greeting">Good Morning</p>
+        </div>
+        <button class="btn-icon" onclick="exportData()" title="Export Data">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- SUMMARY CARDS -->
+    <section class="summary">
+      <div class="card card-today">
+        <div class="card-label">Today's Last Reading</div>
+        <div class="card-value" id="todayValue">--</div>
+        <div class="card-unit">mg/dL</div>
+        <div class="card-status" id="todayStatus">No data yet</div>
+      </div>
+      <div class="card-row">
+        <div class="card card-mini card-normal">
+          <div class="card-label">Normal Range</div>
+          <div class="card-value-sm" id="normalCount">0</div>
+        </div>
+        <div class="card card-mini card-high">
+          <div class="card-label">High Readings</div>
+          <div class="card-value-sm" id="highCount">0</div>
+        </div>
+        <div class="card card-mini card-low">
+          <div class="card-label">Low Readings</div>
+          <div class="card-value-sm" id="lowCount">0</div>
+        </div>
+      </div>
+      <div class="card-row" style="margin-top:8px;">
+        <div class="card card-mini card-today-stat">
+          <div class="card-label">Today Avg</div>
+          <div class="card-value-sm" id="todayAvg">--</div>
+        </div>
+        <div class="card card-mini card-today-stat">
+          <div class="card-label">Today Count</div>
+          <div class="card-value-sm" id="todayCount">0</div>
+        </div>
+        <div class="card card-mini card-today-stat">
+          <div class="card-label">7-Day Avg</div>
+          <div class="card-value-sm" id="weekAvg">--</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ADD READING BUTTON -->
+    <button class="fab" onclick="openModal()" id="fabBtn">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+
+    <!-- CHART SECTION -->
+    <section class="section">
+      <h2 class="section-title">Weekly Trend</h2>
+      <div class="chart-container">
+        <canvas id="chart"></canvas>
+      </div>
+    </section>
+
+    <!-- FOOD AVOIDANCE SECTION -->
+    <section class="section" id="dietSection">
+      <h2 class="section-title">Diet Guide - What to Avoid</h2>
+      <div id="dietAdvice" class="diet-advice">
+        <div class="diet-placeholder">
+          <div class="empty-icon">🍽️</div>
+          <p>Add a reading to see food advice</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSULIN CALCULATOR -->
+    <section class="section" id="insulinSection">
+      <h2 class="section-title">Insulin Calculator</h2>
+      <div class="insulin-card">
+        <div class="insulin-inputs">
+          <div class="form-group">
+            <label>Current Blood Sugar (mg/dL) <span class="autofill-hint" id="autoFillHint" style="display:none;" onclick="autoFillInsulin()">Auto-fill from last reading</span></label>
+            <input type="number" id="insulinBG" placeholder="e.g. 180" min="20" max="600" inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label>Carbs Eaten (grams)</label>
+            <input type="number" id="insulinCarbs" placeholder="e.g. 45" min="0" max="200" inputmode="numeric">
+            <div class="carb-presets">
+              <button class="carb-preset-btn" onclick="setCarbs(15)">15g Snack</button>
+              <button class="carb-preset-btn" onclick="setCarbs(30)">30g Light</button>
+              <button class="carb-preset-btn" onclick="setCarbs(45)">45g Meal</button>
+              <button class="carb-preset-btn" onclick="setCarbs(60)">60g Full</button>
+              <button class="carb-preset-btn" onclick="setCarbs(90)">90g Heavy</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Your Weight (kg)</label>
+            <input type="number" id="insulinWeight" placeholder="e.g. 70" min="20" max="300" inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label>Total Daily Insulin (units)</label>
+            <input type="number" id="insulinTDD" placeholder="e.g. 40" min="5" max="200" inputmode="numeric">
+          </div>
+          <button class="btn-save" onclick="calculateInsulin()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Calculate Insulin
+          </button>
+        </div>
+        <div id="insulinResult" class="insulin-result hidden"></div>
+      </div>
+    </section>
+
+    <!-- HBA1C ESTIMATOR -->
+    <section class="section" id="hba1cSection">
+      <h2 class="section-title">HbA1c Estimator</h2>
+      <div class="hba1c-card">
+        <div id="hba1cResult" class="hba1c-result"></div>
+      </div>
+    </section>
+
+    <!-- WEIGHT RECOMMENDATION -->
+    <section class="section" id="weightSection">
+      <h2 class="section-title">Weight Guide by Sugar</h2>
+      <div class="weight-card">
+        <div class="weight-profile-bar" id="profileBar" style="display:none;">
+          <span class="profile-saved">Profile saved</span>
+          <button class="profile-clear" onclick="clearProfile()">Clear</button>
+        </div>
+        <div class="weight-inputs">
+          <div class="form-group">
+            <label>Gender</label>
+            <div class="radio-group">
+              <label class="radio-btn">
+                <input type="radio" name="gender" value="M" checked>
+                <span>Male</span>
+              </label>
+              <label class="radio-btn">
+                <input type="radio" name="gender" value="F">
+                <span>Female</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Current Weight (kg)</label>
+            <input type="number" id="weightInput" placeholder="e.g. 70" min="20" max="300" inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label>Height (cm)</label>
+            <input type="number" id="heightInput" placeholder="e.g. 170" min="100" max="250" inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label>Latest Sugar Level (mg/dL)</label>
+            <input type="number" id="weightSugar" placeholder="e.g. 140" min="20" max="600" inputmode="numeric">
+          </div>
+          <label class="checkbox-label">
+            <input type="checkbox" id="saveProfileCheck" checked>
+            <span>Save my profile (weight, height, gender)</span>
+          </label>
+          <button class="btn-save" onclick="calculateWeight()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Check Weight
+          </button>
+        </div>
+        <div id="weightResult" class="weight-result hidden"></div>
+      </div>
+    </section>
+
+    <!-- DAILY REMINDER -->
+    <section class="section">
+      <h2 class="section-title">Daily Reminders</h2>
+      <div class="reminder-card">
+        <div class="reminder-info">
+          <div class="reminder-title">Reminder to check sugar</div>
+          <div class="reminder-sub" id="reminderStatus">Not set</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="reminderToggle" onchange="toggleReminder()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="reminder-times" id="reminderTimes" style="display:none;">
+        <div class="reminder-time-row">
+          <label>Morning</label>
+          <input type="time" id="remMorning" value="07:00" onchange="saveReminderTimes()">
+        </div>
+        <div class="reminder-time-row">
+          <label>Afternoon</label>
+          <input type="time" id="remAfternoon" value="13:00" onchange="saveReminderTimes()">
+        </div>
+        <div class="reminder-time-row">
+          <label>Evening</label>
+          <input type="time" id="remEvening" value="20:00" onchange="saveReminderTimes()">
+        </div>
+      </div>
+    </section>
+
+    <!-- QUICK REFERENCE -->
+    <section class="section">
+      <h2 class="section-title">Blood Sugar Guide</h2>
+      <div class="guide-cards">
+        <div class="guide-card guide-low">
+          <div class="guide-emoji">⚠️</div>
+          <div class="guide-label">Low</div>
+          <div class="guide-range">&lt; 70 mg/dL</div>
+          <div class="guide-desc">Eat fast-acting carbs</div>
+        </div>
+        <div class="guide-card guide-normal">
+          <div class="guide-emoji">✅</div>
+          <div class="guide-label">Normal</div>
+          <div class="guide-range">70 - 140 mg/dL</div>
+          <div class="guide-desc">Healthy range</div>
+        </div>
+        <div class="guide-card guide-high">
+          <div class="guide-emoji">🔴</div>
+          <div class="guide-label">High</div>
+          <div class="guide-range">&gt; 200 mg/dL</div>
+          <div class="guide-desc">Consult doctor</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HISTORY -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">History</h2>
+        <button class="btn-text" onclick="clearAllData()" id="clearBtn" style="display:none;">Clear All</button>
+      </div>
+      <div id="historyList" class="history-list">
+        <div class="empty-state">
+          <div class="empty-icon">📊</div>
+          <p>No readings yet</p>
+          <p class="empty-sub">Tap + to add your first reading</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT / DEVELOPER -->
+    <section class="section">
+      <h2 class="section-title">About Developer</h2>
+      <div class="about-card">
+        <div class="about-avatar">SR</div>
+        <div class="about-info">
+          <h3>Saad Bin Riaz</h3>
+          <p class="about-role">Software Developer</p>
+          <p class="about-powered">Powered by <strong>Aiee</strong></p>
+        </div>
+        <div class="about-links">
+          <a href="https://www.linkedin.com/in/saad-bin-riaz-pk/" target="_blank" rel="noopener" class="about-link link-linkedin">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn Profile
+          </a>
+          <a href="https://wa.me/923141088892" target="_blank" rel="noopener" class="about-link link-whatsapp">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp Us
+          </a>
+          <a href="tel:+923141088892" class="about-link link-phone">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            0314-1088892
+          </a>
+        </div>
+      </div>
+      <div class="about-footer-note">
+        <p>Need custom software? Contact us for web apps, mobile apps, and more.</p>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <p>Made by <strong>Saad Bin Riaz</strong> | Powered by <strong>Aiee</strong></p>
+      <p class="footer-contact">📞 0314-1088892 | Software Development Inquiries</p>
+    </footer>
+  </div>
+
+  <!-- ADD READING MODAL -->
+  <div id="modal" class="modal-overlay hidden" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Add Sugar Reading</h2>
+        <button class="btn-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Blood Sugar Level (mg/dL)</label>
+          <input type="number" id="sugarInput" placeholder="e.g. 120" min="20" max="600" inputmode="numeric">
+        </div>
+        <div class="form-group">
+          <label>When did you measure?</label>
+          <div class="radio-group">
+            <label class="radio-btn">
+              <input type="radio" name="timing" value="Fasting" checked>
+              <span>Fasting</span>
+            </label>
+            <label class="radio-btn">
+              <input type="radio" name="timing" value="Before Meal">
+              <span>Before Meal</span>
+            </label>
+            <label class="radio-btn">
+              <input type="radio" name="timing" value="After Meal">
+              <span>After Meal</span>
+            </label>
+            <label class="radio-btn">
+              <input type="radio" name="timing" value="Bedtime">
+              <span>Bedtime</span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Any notes? (optional)</label>
+          <input type="text" id="noteInput" placeholder="e.g. Took medicine, walked after meal">
+        </div>
+        <button class="btn-save" onclick="saveReading()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Save Reading
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRM -->
+  <div id="confirmDialog" class="modal-overlay hidden" onclick="closeConfirm(event)">
+    <div class="modal modal-small" onclick="event.stopPropagation()">
+      <h2>Delete All Data?</h2>
+      <p>This action cannot be undone. All your readings will be permanently removed.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeConfirm()">Cancel</button>
+        <button class="btn-danger" onclick="confirmClear()">Delete All</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="diet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
